@@ -66,8 +66,8 @@ var Snake = React.createClass({
         <form>
           <p>Settings</p>
           <label>Speed (lower is faster)<input onChange={this.updateConfig} ref="speed" name="speed" value={this.state.speed} type="number" /></label>
-          <label>Columns<input onChange={this.updateConfig} ref="columns" name="columns" value={this.state.columns} type="number" /></label>
-          <label>Rows<input onChange={this.updateConfig} ref="rows" name="rows" value={this.state.rows} type="number" /></label>
+          <label>Columns<input onChange={this.updateConfig} ref="columns" name="columns" value={this.state.columns} type="number" min="3" max="50"/></label>
+          <label>Rows<input onChange={this.updateConfig} ref="rows" name="rows" value={this.state.rows} type="number" min="3" max="50"/></label>
         </form>
       </div>
     );
