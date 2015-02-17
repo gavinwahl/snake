@@ -101,14 +101,14 @@ var Snake = React.createClass({
       return;
 
     var direction = null;
-    if ( event.which == 38 )
-      direction = 'u';
-    else if ( event.which == 37 )
+    if ( event.which == 37 || event.which == 72 ) // h
       direction = 'l';
-    else if ( event.which == 39 )
-      direction = 'r';
-    else if ( event.which == 40 )
+    else if ( event.which == 40 || event.which == 74 ) // j
       direction = 'd';
+    else if ( event.which == 38 || event.which == 75 ) // k
+      direction = 'u';
+    else if ( event.which == 39 || event.which == 76 ) // l
+      direction = 'r';
 
     if ( direction && lib.move(this.state.snake, direction) ) {
       this.setState({direction: direction});
