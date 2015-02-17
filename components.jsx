@@ -64,9 +64,10 @@ var Snake = React.createClass({
         <p>Score: {this.state.snake.length}</p>
         <p>Feel free to leave the page in the middle of your game. It will still be here when you get back.</p>
         <form>
-          <input onChange={this.updateConfig} ref="speed" name="speed" value={this.state.speed} type="number" />
-          <input onChange={this.updateConfig} ref="columns" name="columns" value={this.state.columns} type="number" />
-          <input onChange={this.updateConfig} ref="rows" name="rows" value={this.state.rows} type="number" />
+          <p>Settings</p>
+          <label>Speed (lower is faster)<input onChange={this.updateConfig} ref="speed" name="speed" value={this.state.speed} type="number" /></label>
+          <label>Columns<input onChange={this.updateConfig} ref="columns" name="columns" value={this.state.columns} type="number" /></label>
+          <label>Rows<input onChange={this.updateConfig} ref="rows" name="rows" value={this.state.rows} type="number" /></label>
         </form>
       </div>
     );

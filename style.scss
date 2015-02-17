@@ -14,3 +14,16 @@ table {
     background: blue;
   }
 }
+
+form {
+  max-width: 600px;
+  label {
+    float: left;
+    display: block;
+    width: 75%;
+  }
+  input {
+    float: right;
+    width: 50%;
+  }
+}
