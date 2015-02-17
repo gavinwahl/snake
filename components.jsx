@@ -4,6 +4,7 @@ var React = require('react/addons');
 var _ = require('underscore');
 var lib = require('./lib');
 var cx = React.addons.classSet;
+var last = lib.last;
 
 var Cell = React.createClass({
   render: function() {
@@ -15,9 +16,25 @@ var Cell = React.createClass({
     }
     // Related cells share a row or column with the head of the snake. To make
     // it easier to see when you're aligned with the cookie.
-    var isRelated = this.props.snake[this.props.snake.length - 1][0] == this.props.myPos[0] ||
-                    this.props.snake[this.props.snake.length - 1][1] == this.props.myPos[1];
+    var isRelated = last(this.props.snake)[0] == this.props.myPos[0] ||
+                    last(this.props.snake)[1] == this.props.myPos[1];
     return <td className={cx({active: isActive, cookie: isCookie, related: isRelated})}/>;
+  },
+  shouldComponentUpdate: function(nextProps) {
+          // old end of the snake
+    return _.isEqual(this.props.myPos, this.props.snake[0]) ||
+          // shares row or column with new or old head of snake
+          this.props.myPos[0] == last(this.props.snake)[0] ||
+          this.props.myPos[1] == last(this.props.snake)[1] ||
+          this.props.myPos[0] == last(nextProps.snake)[0] ||
+          this.props.myPos[1] == last(nextProps.snake)[1] ||
+          // new or old cookie
+          _.isEqual(this.props.myPos, this.props.cookie) ||
+          _.isEqual(this.props.myPos, nextProps.cookie) ||
+          // Heuristic for resetting the board. Checks for 'normal' moves, where the
+          // second-to-last snake section because the last.
+          (!_.isEqual(last(this.props.snake), last(nextProps.snake)) && !_.isEqual(this.props.snake[1], nextProps.snake[0]) && !_.isEqual(this.props.snake[0], nextProps.snake[0])) ||
+      false;
   }
 });
 
@@ -52,7 +69,7 @@ var Snake = React.createClass({
     return _.extend(this.getInitialSnake(), {
       rows: 20,
       columns: 20,
-      speed: 300,
+      speed: 300
     });
   },
   render: function() {
@@ -86,7 +103,7 @@ var Snake = React.createClass({
       cookie = this.state.cookie;
 
     snake = lib.move(this.state.snake, this.state.direction);
-    if ( lib.isOverlapping(snake) || !lib.isOnBoard(snake[snake.length - 1], this.state.rows, this.state.columns) ) {
+    if ( lib.isOverlapping(snake) || !lib.isOnBoard(last(snake), this.state.rows, this.state.columns) ) {
       this.setState({lost: true}, () => this.refs.restart.getDOMNode().focus());
       return;
     }
@@ -153,7 +170,7 @@ var Snake = React.createClass({
     });
   },
   restart: function() {
-    this.setState(this.getInitialSnake(), this.tick);
+    this.setState(this.getInitialSnake(), () => { this.forceUpdate(); this.tick(); });
   }
 });
 

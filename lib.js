@@ -13,18 +13,18 @@ function move(snake, direction, lengthen) {
   for ( var i = 0; i < snake.length - 1; i++ ) {
     snake[i] = snake[i+1].slice();
   }
-  snake[snake.length - 1] = snake[snake.length - 1].slice();
+  snake[snake.length - 1] = last(snake).slice();
 
   if ( direction == 'r' )
-    snake[snake.length - 1][0] += 1;
+    last(snake)[0] += 1;
   else if ( direction == 'l' )
-    snake[snake.length - 1][0] -= 1;
+    last(snake)[0] -= 1;
   else if ( direction == 'd' )
-    snake[snake.length - 1][1] += 1;
+    last(snake)[1] += 1;
   else if ( direction == 'u' )
-    snake[snake.length - 1][1] -= 1;
+    last(snake)[1] -= 1;
 
-  if ( snake.length > 1 && _.isEqual(snake[snake.length - 1], previous) ) {
+  if ( snake.length > 1 && _.isEqual(last(snake), previous) ) {
     return null;
   }
   if ( lengthen )
@@ -38,7 +38,7 @@ function randint(n) {
 
 function isOverlapping(snake) {
   for ( var i = 0; i < snake.length - 1; i++ ) {
-    if ( _.isEqual(snake[i], snake[snake.length - 1]) )
+    if ( _.isEqual(snake[i], last(snake)) )
       return true;
   }
   return false;
@@ -48,7 +48,12 @@ function isOnBoard(pos, rows, columns) {
   return !(pos[0] < 0 || pos[0] >= columns || pos[1] < 0 || pos[1] >= rows);
 }
 
+function last(ary) {
+  return ary[ary.length - 1];
+}
+
 exports.move = move;
 exports.randint = randint;
 exports.isOverlapping = isOverlapping;
 exports.isOnBoard = isOnBoard;
+exports.last = last;
