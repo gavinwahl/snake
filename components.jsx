@@ -55,6 +55,8 @@ var Snake = React.createClass({
       <div>
         <Board rows={this.state.rows} columns={this.state.columns} snake={this.state.snake} cookie={this.state.cookie}/>
         {this.state.lost ? <div className="lost">You lost. <button ref="restart" onClick={this.restart}>restart?</button></div> : null}
+        {this.state.paused ? <div>paused. spacebar to unpause.</div> : <div>playing. spacebar to pause.</div>}
+        <div>Score: {this.state.snake.length}</div>
         <form>
           <input onChange={this.updateConfig} ref="speed" name="speed" value={this.state.speed} type="number" />
           <input onChange={this.updateConfig} ref="columns" name="columns" value={this.state.columns} type="number" />
@@ -100,15 +102,22 @@ var Snake = React.createClass({
     if ( this.state.lost )
       return;
 
+    if ( event.which == 32 ) { // space
+      this.togglePause();
+      return;
+    } else if ( this.state.paused ) {
+      return;
+    }
+
     var direction = null;
-    if ( event.which == 38 )
-      direction = 'u';
-    else if ( event.which == 37 )
+    if ( event.which == 37 || event.which == 72 ) // h
       direction = 'l';
-    else if ( event.which == 39 )
-      direction = 'r';
-    else if ( event.which == 40 )
+    else if ( event.which == 40 || event.which == 74 ) // j
       direction = 'd';
+    else if ( event.which == 38 || event.which == 75 ) // k
+      direction = 'u';
+    else if ( event.which == 39 || event.which == 76 ) // l
+      direction = 'r';
 
     if ( direction && lib.move(this.state.snake, direction) ) {
       this.setState({direction: direction});
@@ -128,6 +137,14 @@ var Snake = React.createClass({
   },
   restart: function() {
     this.setState(this.getInitialState(), this.tick);
+  },
+  togglePause: function() {
+    this.setState({paused: !this.state.paused}, () => {
+      if ( this.state.paused )
+        clearTimeout(this.timeout);
+      else
+        this.tick();
+    });
   }
 });
 
