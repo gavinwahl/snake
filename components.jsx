@@ -55,6 +55,7 @@ var Snake = React.createClass({
       <div>
         <Board rows={this.state.rows} columns={this.state.columns} snake={this.state.snake} cookie={this.state.cookie}/>
         {this.state.lost ? <div className="lost">You lost. <button ref="restart" onClick={this.restart}>restart?</button></div> : null}
+        {this.state.paused ? <div>paused. spacebar to unpause.</div> : <div>playing. spacebar to pause.</div>}
         <form>
           <input onChange={this.updateConfig} ref="speed" name="speed" value={this.state.speed} type="number" />
           <input onChange={this.updateConfig} ref="columns" name="columns" value={this.state.columns} type="number" />
@@ -100,6 +101,13 @@ var Snake = React.createClass({
     if ( this.state.lost )
       return;
 
+    if ( event.which == 32 ) { // space
+      this.togglePause();
+      return;
+    } else if ( this.state.paused ) {
+      return;
+    }
+
     var direction = null;
     if ( event.which == 37 || event.which == 72 ) // h
       direction = 'l';
@@ -128,6 +136,14 @@ var Snake = React.createClass({
   },
   restart: function() {
     this.setState(this.getInitialState(), this.tick);
+  },
+  togglePause: function() {
+    this.setState({paused: !this.state.paused}, () => {
+      if ( this.state.paused )
+        clearTimeout(this.timeout);
+      else
+        this.tick();
+    });
   }
 });
 
