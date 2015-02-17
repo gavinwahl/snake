@@ -39,17 +39,21 @@ var Board = React.createClass({
 });
 
 var Snake = React.createClass({
-  getInitialState: function() {
+  getInitialSnake: function() {
     return {
       snake: [[1,0], [2,0], [3,0], [4,0]],
       direction: 'r',
       cookie: null,
+      lost: false,
+      paused: false
+    };
+  },
+  getInitialState: function() {
+    return _.extend(this.getInitialSnake(), {
       rows: 20,
       columns: 20,
       speed: 300,
-      lost: false,
-      paused: false,
-    };
+    });
   },
   render: function() {
     return (
@@ -70,7 +74,7 @@ var Snake = React.createClass({
   tick: function() {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(this.tick, this.state.speed);
-    if ( this.state.paused )
+    if ( this.state.paused || this.state.lost )
       return;
 
     var cookie, snake;
@@ -148,7 +152,7 @@ var Snake = React.createClass({
     });
   },
   restart: function() {
-    this.setState(this.getInitialState(), this.tick);
+    this.setState(this.getInitialSnake(), this.tick);
   }
 });
 
