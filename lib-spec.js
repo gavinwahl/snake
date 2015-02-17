@@ -26,6 +26,11 @@ describe('move', function() {
   it('lengthen', function() {
     expect(lib.move([[1,1]], 'r', true)).toEqual([[1,1], [2,1]]);
   });
+  it('doesn\'t mutate', function() {
+    var snake = [[1,1]];
+    lib.move(snake, 'r');
+    expect(snake).toEqual([[1,1]])
+  });
 });
 
 describe('isOverlapping', function() {

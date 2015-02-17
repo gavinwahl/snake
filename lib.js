@@ -3,32 +3,27 @@
 var _ = require('underscore');
 
 function move(snake, direction, lengthen) {
+  // make a copy
   snake = snake.slice();
 
-  var first = snake[0];
-
-  if ( snake.length > 1 )
-    var previous = snake[snake.length - 2];
-
-  for ( var i = 0; i < snake.length - 1; i++ ) {
-    snake[i] = snake[i+1].slice();
-  }
-  snake[snake.length - 1] = last(snake).slice();
-
+  var head = last(snake).slice();
   if ( direction == 'r' )
-    last(snake)[0] += 1;
+    head[0] += 1;
   else if ( direction == 'l' )
-    last(snake)[0] -= 1;
+    head[0] -= 1;
   else if ( direction == 'd' )
-    last(snake)[1] += 1;
+    head[1] += 1;
   else if ( direction == 'u' )
-    last(snake)[1] -= 1;
-
-  if ( snake.length > 1 && _.isEqual(last(snake), previous) ) {
+    head[1] -= 1;
+  if ( snake.length > 1 && _.isEqual(head, snake[snake.length - 2]) ) {
+    // trying to turn on itself
     return null;
   }
-  if ( lengthen )
-    snake.unshift(first);
+  snake.push(head);
+
+  if ( ! lengthen )
+    snake.shift();
+
   return snake;
 }
 
