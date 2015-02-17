@@ -56,6 +56,7 @@ var Snake = React.createClass({
         <Board rows={this.state.rows} columns={this.state.columns} snake={this.state.snake} cookie={this.state.cookie}/>
         {this.state.lost ? <div className="lost">You lost. <button ref="restart" onClick={this.restart}>restart?</button></div> : null}
         {this.state.paused ? <div>paused. spacebar to unpause.</div> : <div>playing. spacebar to pause.</div>}
+        <div>Score: {this.state.snake.length}</div>
         <form>
           <input onChange={this.updateConfig} ref="speed" name="speed" value={this.state.speed} type="number" />
           <input onChange={this.updateConfig} ref="columns" name="columns" value={this.state.columns} type="number" />
