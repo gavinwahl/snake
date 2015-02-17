@@ -1,0 +1,16 @@
+table {
+  td {
+    border: 1px solid black;
+    height: 10px;
+    width: 10px;
+  }
+  .related {
+    background: lightgrey;
+  }
+  .active {
+    background: red;
+  }
+  .cookie {
+    background: blue;
+  }
+}

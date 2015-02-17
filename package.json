@@ -1,0 +1,14 @@
+{
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "css-loader": "^0.9.1",
+    "jasmine-node": "^1.14.5",
+    "jsx-loader": "^0.12.2",
+    "react-addons": "^0.9.1-deprecated",
+    "sass-loader": "^0.4.0-beta.1",
+    "style-loader": "^0.8.3",
+    "underscore": "^1.7.0",
+    "webpack": "^1.5.3",
+    "webpack-dev-server": "^1.7.0"
+  }
+}
