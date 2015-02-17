@@ -42,3 +42,8 @@ describe('isOnBoard', function() {
     expect(lib.isOnBoard([1,10], 10, 20)).toEqual(false)
   });
 });
+
+describe('last', function() {
+    expect(lib.last([1])).toEqual(1);
+    expect(lib.last([1, 2])).toEqual(2);
+});

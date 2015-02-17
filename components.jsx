@@ -4,6 +4,7 @@ var React = require('react/addons');
 var _ = require('underscore');
 var lib = require('./lib');
 var cx = React.addons.classSet;
+var last = lib.last;
 
 var Cell = React.createClass({
   render: function() {
@@ -15,9 +16,25 @@ var Cell = React.createClass({
     }
     // Related cells share a row or column with the head of the snake. To make
     // it easier to see when you're aligned with the cookie.
-    var isRelated = this.props.snake[this.props.snake.length - 1][0] == this.props.myPos[0] ||
-                    this.props.snake[this.props.snake.length - 1][1] == this.props.myPos[1];
+    var isRelated = last(this.props.snake)[0] == this.props.myPos[0] ||
+                    last(this.props.snake)[1] == this.props.myPos[1];
     return <td className={cx({active: isActive, cookie: isCookie, related: isRelated})}/>;
+  },
+  shouldComponentUpdate: function(nextProps) {
+          // old end of the snake
+    return _.isEqual(this.props.myPos, this.props.snake[0]) ||
+          // shares row or column with new or old head of snake
+          this.props.myPos[0] == last(this.props.snake)[0] ||
+          this.props.myPos[1] == last(this.props.snake)[1] ||
+          this.props.myPos[0] == last(nextProps.snake)[0] ||
+          this.props.myPos[1] == last(nextProps.snake)[1] ||
+          // new or old cookie
+          _.isEqual(this.props.myPos, this.props.cookie) ||
+          _.isEqual(this.props.myPos, nextProps.cookie) ||
+          // Heuristic for resetting the board. Checks for 'normal' moves, where the
+          // second-to-last snake section because the last.
+          (!_.isEqual(last(this.props.snake), last(nextProps.snake)) && !_.isEqual(this.props.snake[1], nextProps.snake[0]) && !_.isEqual(this.props.snake[0], nextProps.snake[0])) ||
+      false;
   }
 });
 
@@ -53,6 +70,7 @@ var Snake = React.createClass({
       rows: 20,
       columns: 20,
       speed: 300,
+      highScore: 0,
     });
   },
   render: function() {
@@ -61,12 +79,13 @@ var Snake = React.createClass({
         <Board rows={this.state.rows} columns={this.state.columns} snake={this.state.snake} cookie={this.state.cookie}/>
         {this.state.lost ? <div className="lost">You lost. <button ref="restart" onClick={this.restart}>restart?</button></div> : null}
         {this.state.paused ? <div>paused. spacebar to unpause.</div> : <div>playing. spacebar to pause.</div>}
-        <p>Score: {this.state.snake.length}</p>
+        <p>Score: {this.score()}. High score: {this.state.highScore}</p>
         <p>Feel free to leave the page in the middle of your game. It will still be here when you get back.</p>
         <form>
-          <input onChange={this.updateConfig} ref="speed" name="speed" value={this.state.speed} type="number" />
-          <input onChange={this.updateConfig} ref="columns" name="columns" value={this.state.columns} type="number" />
-          <input onChange={this.updateConfig} ref="rows" name="rows" value={this.state.rows} type="number" />
+          <p>Settings</p>
+          <label>Speed (lower is faster)<input onChange={this.updateConfig} ref="speed" name="speed" value={this.state.speed} type="number" /></label>
+          <label>Columns<input onChange={this.updateConfig} ref="columns" name="columns" value={this.state.columns} type="number" min="3" max="50"/></label>
+          <label>Rows<input onChange={this.updateConfig} ref="rows" name="rows" value={this.state.rows} type="number" min="3" max="50"/></label>
         </form>
       </div>
     );
@@ -85,19 +104,31 @@ var Snake = React.createClass({
       cookie = this.state.cookie;
 
     snake = lib.move(this.state.snake, this.state.direction);
-    if ( lib.isOverlapping(snake) || !lib.isOnBoard(snake[snake.length - 1], this.state.rows, this.state.columns) ) {
+    if ( lib.isOverlapping(snake) || !lib.isOnBoard(last(snake), this.state.rows, this.state.columns) ) {
       this.setState({lost: true}, () => this.refs.restart.getDOMNode().focus());
       return;
     }
     if ( _.isEqual(snake[snake.length-1], cookie) ) {
       cookie = this.randomPosition();
       snake = lib.move(this.state.snake, this.state.direction, true);
+      this.setState({
+        snake: snake
+      }, () => {
+        // we can't call this.store() until state has actually updated to
+        // reflect the new snake.
+        this.setState({
+          highScore: _.max([this.state.highScore, this.score()]),
+        })
+      });
     }
 
     this.setState({
       snake: snake,
       cookie: cookie,
     });
+  },
+  score: function() {
+    return this.state.snake.length;
   },
   componentDidMount: function() {
     this.tick();
@@ -152,7 +183,7 @@ var Snake = React.createClass({
     });
   },
   restart: function() {
-    this.setState(this.getInitialSnake(), this.tick);
+    this.setState(this.getInitialSnake(), () => { this.forceUpdate(); this.tick(); });
   }
 });
 
