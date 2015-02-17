@@ -174,6 +174,7 @@ var Snake = React.createClass({
     if ( this.state.snake.length == this.state.rows * this.state.columns ) {
       alert('There is no place for another cookie! You win!');
       this.setState({paused: true});
+      return;
     }
     do {
       var cookie = [lib.randint(this.state.columns), lib.randint(this.state.rows)];
