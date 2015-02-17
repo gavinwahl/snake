@@ -13,5 +13,9 @@
   },
   "scripts": {
     "test": "jasmine-node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gavinwahl/snake.git"
   }
 }
