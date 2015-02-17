@@ -98,8 +98,7 @@ var Snake = React.createClass({
 
     var cookie, snake;
     if ( ! this.state.cookie )
-      // TODO: make sure this is not overlapping the snake
-      cookie = this.randomPosition();
+      cookie = this.nextCookiePosition();
     else
       cookie = this.state.cookie;
 
@@ -109,22 +108,22 @@ var Snake = React.createClass({
       return;
     }
     if ( _.isEqual(snake[snake.length-1], cookie) ) {
-      cookie = this.randomPosition();
       snake = lib.move(this.state.snake, this.state.direction, true);
       this.setState({
         snake: snake
       }, () => {
-        // we can't call this.store() until state has actually updated to
+        // we can't calculate these until state has actually updated to
         // reflect the new snake.
         this.setState({
           highScore: _.max([this.state.highScore, this.score()]),
+          cookie: this.nextCookiePosition(),
         })
       });
     }
 
-    this.setState({
-      snake: snake,
-      cookie: cookie,
+    this.setState({snake: snake}, () => {
+      if (! this.state.cookie )
+        this.setState({cookie: this.nextCookiePosition()});
     });
   },
   score: function() {
@@ -171,8 +170,15 @@ var Snake = React.createClass({
       this.tick();
     }
   },
-  randomPosition: function() {
-    return [lib.randint(this.state.columns), lib.randint(this.state.rows)];
+  nextCookiePosition: function() {
+    if ( this.state.snake.length == this.state.rows * this.state.columns ) {
+      alert('There is no place for another cookie! You win!');
+      this.setState({paused: true});
+    }
+    do {
+      var cookie = [lib.randint(this.state.columns), lib.randint(this.state.rows)];
+    } while ( _.some(this.state.snake, (i) => _.isEqual(i, cookie)) );
+    return cookie;
   },
   updateConfig: function(ev) {
     ev.stopPropagation();
