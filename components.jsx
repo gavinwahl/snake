@@ -48,6 +48,7 @@ var Snake = React.createClass({
       columns: 20,
       speed: 300,
       lost: false,
+      paused: false,
     };
   },
   render: function() {
@@ -56,7 +57,8 @@ var Snake = React.createClass({
         <Board rows={this.state.rows} columns={this.state.columns} snake={this.state.snake} cookie={this.state.cookie}/>
         {this.state.lost ? <div className="lost">You lost. <button ref="restart" onClick={this.restart}>restart?</button></div> : null}
         {this.state.paused ? <div>paused. spacebar to unpause.</div> : <div>playing. spacebar to pause.</div>}
-        <div>Score: {this.state.snake.length}</div>
+        <p>Score: {this.state.snake.length}</p>
+        <p>Feel free to leave the page in the middle of your game. It will still be here when you get back.</p>
         <form>
           <input onChange={this.updateConfig} ref="speed" name="speed" value={this.state.speed} type="number" />
           <input onChange={this.updateConfig} ref="columns" name="columns" value={this.state.columns} type="number" />
@@ -67,6 +69,10 @@ var Snake = React.createClass({
   },
   tick: function() {
     clearTimeout(this.timeout);
+    this.timeout = setTimeout(this.tick, this.state.speed);
+    if ( this.state.paused )
+      return;
+
     var cookie, snake;
     if ( ! this.state.cookie )
       // TODO: make sure this is not overlapping the snake
@@ -88,7 +94,6 @@ var Snake = React.createClass({
       snake: snake,
       cookie: cookie,
     });
-    this.timeout = setTimeout(this.tick, this.state.speed);
   },
   componentDidMount: function() {
     this.tick();
@@ -98,12 +103,19 @@ var Snake = React.createClass({
     clearTimeout(this.timeout);
     document.body.removeEventListener('keydown', this.onKeyDown);
   },
+  componentDidUpdate: function() {
+    localStorage.snakeState = JSON.stringify(this.state);
+  },
+  componentWillMount: function() {
+    if ( localStorage.snakeState )
+      this.setState(JSON.parse(localStorage.snakeState));
+  },
   onKeyDown: function(event) {
     if ( this.state.lost )
       return;
 
     if ( event.which == 32 ) { // space
-      this.togglePause();
+      this.setState({paused: !this.state.paused});
       return;
     } else if ( this.state.paused ) {
       return;
@@ -137,14 +149,6 @@ var Snake = React.createClass({
   },
   restart: function() {
     this.setState(this.getInitialState(), this.tick);
-  },
-  togglePause: function() {
-    this.setState({paused: !this.state.paused}, () => {
-      if ( this.state.paused )
-        clearTimeout(this.timeout);
-      else
-        this.tick();
-    });
   }
 });
 
