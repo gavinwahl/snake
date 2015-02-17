@@ -69,7 +69,8 @@ var Snake = React.createClass({
     return _.extend(this.getInitialSnake(), {
       rows: 20,
       columns: 20,
-      speed: 300
+      speed: 300,
+      highScore: 0,
     });
   },
   render: function() {
@@ -78,7 +79,7 @@ var Snake = React.createClass({
         <Board rows={this.state.rows} columns={this.state.columns} snake={this.state.snake} cookie={this.state.cookie}/>
         {this.state.lost ? <div className="lost">You lost. <button ref="restart" onClick={this.restart}>restart?</button></div> : null}
         {this.state.paused ? <div>paused. spacebar to unpause.</div> : <div>playing. spacebar to pause.</div>}
-        <p>Score: {this.state.snake.length}</p>
+        <p>Score: {this.score()}. High score: {this.state.highScore}</p>
         <p>Feel free to leave the page in the middle of your game. It will still be here when you get back.</p>
         <form>
           <p>Settings</p>
@@ -110,12 +111,24 @@ var Snake = React.createClass({
     if ( _.isEqual(snake[snake.length-1], cookie) ) {
       cookie = this.randomPosition();
       snake = lib.move(this.state.snake, this.state.direction, true);
+      this.setState({
+        snake: snake
+      }, () => {
+        // we can't call this.store() until state has actually updated to
+        // reflect the new snake.
+        this.setState({
+          highScore: _.max([this.state.highScore, this.score()]),
+        })
+      });
     }
 
     this.setState({
       snake: snake,
       cookie: cookie,
     });
+  },
+  score: function() {
+    return this.state.snake.length;
   },
   componentDidMount: function() {
     this.tick();
